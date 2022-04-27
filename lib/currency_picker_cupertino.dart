@@ -19,14 +19,14 @@ const double _kDefaultDiameterRatio = 1.35;
 /// in cupertino style
 class CurrencyPickerCupertino extends StatefulWidget {
   /// Callback that is called with selected Country
-  final ValueChanged<Country> onValuePicked;
+  final ValueChanged<Country?>? onValuePicked;
 
   /// Filters the available country list
-  final ItemFilter itemFilter;
+  final ItemFilter? itemFilter;
 
   ///Callback that is called with selected item of type Country which returns a
   ///Widget to build list view item inside dialog
-  final ItemBuilder itemBuilder;
+  final ItemBuilder? itemBuilder;
 
   ///The [itemExtent] of [CupertinoPicker]
   /// The uniform height of all children.
@@ -39,7 +39,7 @@ class CurrencyPickerCupertino extends StatefulWidget {
   final double pickerSheetHeight;
 
   ///The TextStyle that is applied to Text widgets inside item
-  final TextStyle textStyle;
+  final TextStyle? textStyle;
 
   /// Relative ratio between this picker's height and the simulated cylinder's diameter.
   ///
@@ -59,23 +59,23 @@ class CurrencyPickerCupertino extends StatefulWidget {
   final Color backgroundColor;
 
   /// {@macro flutter.rendering.wheelList.offAxisFraction}
-  final double offAxisFraction;
+  final double? offAxisFraction;
 
   /// {@macro flutter.rendering.wheelList.useMagnifier}
-  final bool useMagnifier;
+  final bool? useMagnifier;
 
   /// {@macro flutter.rendering.wheelList.magnification}
-  final double magnification;
+  final double? magnification;
 
-  final Country initialCountry;
+  final Country? initialCountry;
 
   /// A [FixedExtentScrollController] to read and control the current item.
   ///
   /// If null, an implicit one will be created internally.
-  final FixedExtentScrollController scrollController;
+  final FixedExtentScrollController? scrollController;
 
   const CurrencyPickerCupertino({
-    Key key,
+    Key? key,
     this.onValuePicked,
     this.itemBuilder,
     this.itemFilter,
@@ -96,8 +96,8 @@ class CurrencyPickerCupertino extends StatefulWidget {
 }
 
 class _CupertinoCurrencyPickerState extends State<CurrencyPickerCupertino> {
-  List<Country> _countries;
-  FixedExtentScrollController _scrollController;
+  List<Country>? _countries;
+  FixedExtentScrollController? _scrollController;
 
   @override
   void initState() {
@@ -110,10 +110,12 @@ class _CupertinoCurrencyPickerState extends State<CurrencyPickerCupertino> {
 
     if ((_scrollController == null) && (this.widget.initialCountry != null)) {
       var countyInList = _countries
-          .where((c) => c.currencyCode == this.widget.initialCountry.currencyCode)
+          ?.where((c) => c.currencyCode == this.widget.initialCountry?.currencyCode)
           .first;
       _scrollController = FixedExtentScrollController(
-          initialItem: _countries.indexOf(countyInList));
+          initialItem: countyInList != null
+              ? _countries?.indexOf(countyInList) ?? 0
+              : 0);
     }
   }
 
@@ -149,16 +151,16 @@ class _CupertinoCurrencyPickerState extends State<CurrencyPickerCupertino> {
       itemExtent: widget.pickerItemHeight,
       diameterRatio: widget.diameterRatio,
       backgroundColor: widget.backgroundColor,
-      offAxisFraction: widget.offAxisFraction,
-      useMagnifier: widget.useMagnifier,
-      magnification: widget.magnification,
+      offAxisFraction: widget.offAxisFraction ?? 0,
+      useMagnifier: widget.useMagnifier ?? false,
+      magnification: widget.magnification ?? 0,
       children: _countries
-          .map<Widget>((Country country) => widget.itemBuilder != null
-              ? widget.itemBuilder(country)
+          ?.map<Widget>((Country country) => widget.itemBuilder != null
+              ? widget.itemBuilder!(country)
               : _buildDefaultItem(country))
-          .toList(),
+          .toList() ?? [],
       onSelectedItemChanged: (int index) {
-        widget.onValuePicked(_countries[index]);
+        widget.onValuePicked?.call(_countries?.elementAt(index));
       },
     );
   }
@@ -171,7 +173,7 @@ class _CupertinoCurrencyPickerState extends State<CurrencyPickerCupertino> {
         children: <Widget>[
           CurrencyPickerUtils.getDefaultFlagImage(country),
           SizedBox(width: 8.0),
-          Flexible(child: Text(country.name))
+          Flexible(child: Text(country.name ?? ""))
         ],
       ),
     );

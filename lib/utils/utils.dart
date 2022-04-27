@@ -6,7 +6,7 @@ class CurrencyPickerUtils {
   static Country getCountryByIsoCode(String isoCode) {
     try {
       return countryList.firstWhere(
-        (country) => country.isoCode.toLowerCase() == isoCode.toLowerCase(),
+        (country) => country.isoCode?.toLowerCase() == isoCode.toLowerCase(),
       );
     } catch (error) {
       throw Exception("The initialValue provided is not a supported iso code!");
@@ -30,7 +30,7 @@ class CurrencyPickerUtils {
   static Country getCountryByCurrencyCode(String currencyCode) {
     try {
       return countryList.firstWhere(
-        (country) => country.currencyCode.toLowerCase() == currencyCode.toLowerCase(),
+        (country) => country.currencyCode?.toLowerCase() == currencyCode.toLowerCase(),
       );
     } catch (error) {
       throw Exception(
